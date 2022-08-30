@@ -113,3 +113,50 @@ def naiveRetroSynthesis(start, end):
                 closestSimilarity = similarity
 
     return reactionOrder[indexOfClosest]
+################
+# Below, I am making a minimax based approach of trying to choose the best move after
+# backtracking rather than creating all possible combinations.
+
+def minimax(startSmile, endingSmile, possibleReactions, depth):
+
+    bestReactionSet = [[]]
+    minimaxhelper(startSmile, endingSmile, possibleReactions, bestReactionSet, [], [-999], depth)
+    return bestReactionSet[0]
+
+# def minimaxhelper(startSmile, endingSmile, possibleReactions,
+#                   bestReactionSet, currentReacSet, depth):
+#     if startSmile == endingSmile or depth == 0:
+#         return evaluate(startSmile, endingSmile)
+#
+#     maxEval = -999 # Initially set eval of that posn to -999
+#     for reaction in possibleReactions:
+#         currentReacSet.append(reaction)
+#         # Carry out the reaction and then evaluate the new smile with ending smile
+#         newSmile = reaction(startSmile)
+#         val = minimaxhelper(newSmile, endingSmile, possibleReactions, depth - 1)
+#         if val > maxEval:
+#             maxEval = val
+#             bestReactionSet = currentReacSet[:]
+#
+#         currentReacSet.pop()
+#
+#     return maxEval
+
+def minimaxhelper(startSmile, endingSmile, possibleReactions,
+                  bestReactionSet, currentReacSet, bestVal, depth):
+    if startSmile == endingSmile or depth == 0:
+        val = evaluate(startSmile, endingSmile)
+        if val > bestVal[0]:
+            bestReactionSet[0] = currentReacSet[:]
+            bestVal[0] = val
+        return
+
+    for reaction in possibleReactions:
+        currentReacSet.append(reaction)
+        # Carry out the reaction and then evaluate the new smile with ending smile
+        newSmileList = reaction(startSmile)
+        for newSmile in newSmileList:
+            minimaxhelper(newSmile, endingSmile, possibleReactions, bestReactionSet,
+                          currentReacSet, bestVal, depth - 1)
+
+        currentReacSet.pop()
