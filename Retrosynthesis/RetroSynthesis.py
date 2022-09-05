@@ -1,5 +1,6 @@
 """
-This file contains various attempts to make a retrosynthesis AI
+This file contains various attempts to make a retrosynthesis AI.
+Yay
 """
 from rdkit import Chem
 from rdkit import DataStructs
