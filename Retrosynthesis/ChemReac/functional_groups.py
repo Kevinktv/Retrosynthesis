@@ -3,13 +3,13 @@ from rdkit import Chem
 
 class FunctionalGroups:
 
-
-    # UPDATED METHOD: This may possibly much much simplify the problem of finding specific functional groups in a given molecule
+    # This class is used to identify functional groups that exist within a given molecule.
 
     @staticmethod
     def alkene(smile):
+
         m = Chem.MolFromSmiles(smile)
-        patt = Chem.MolFromSmarts('C=C')
+        patt = Chem.MolFromSmarts("[C:1]=[C:2]")
         FG_found = m.HasSubstructMatch(patt)
 
         if FG_found == True:
@@ -21,7 +21,7 @@ class FunctionalGroups:
     def alkyne(smile):
         m = Chem.MolFromSmiles(smile)
         patt = Chem.MolFromSmarts('C#C')
-        FG_found = m.HasSubstructMatch(pat)
+        FG_found = m.HasSubstructMatch(patt)
 
         if FG_found == True:
             return True
@@ -157,6 +157,83 @@ class FunctionalGroups:
     def amide(smile):
         m = Chem.MolFromSmiles(smile)
         patt = Chem.MolFromSmiles("C(N)=O")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def epoxide(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmiles("C1CO1")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def ring_alkene(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C;R]=[C;R]")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def nonring_alkene(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C;!R]=[C;!R]")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def cleaved_alkene(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C]=[100*]")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def non_ring_1_2_diols(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C;!R]([O])-[C;!R]([O])")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def ring_1_2_diols(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C;R]([O])-[C;R]([O])")
+        FG_found = m.HasSubstructMatch(patt)
+
+        if FG_found == True:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def cleaved_ring_vicinal_diols(smile):
+        m = Chem.MolFromSmiles(smile)
+        patt = Chem.MolFromSmarts("[C]([100*])[O]")
         FG_found = m.HasSubstructMatch(patt)
 
         if FG_found == True:
