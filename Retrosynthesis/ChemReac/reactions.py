@@ -1266,152 +1266,152 @@ class AlkeneReactions:
         #     k += 1
         return smile_products
 
-    @staticmethod
-    def KMnO4_alkene_cleavage(smile):
-        # draw(smile)
-        smile_products = [smile]
-
-        i = 0
-        while i in range(len(smile_products)):
-            if FunctionalGroups.ring_alkene(smile_products[i]) == True:
-                m = Chem.MolFromSmiles(smile_products[i])
-
-                bis = m.GetSubstructMatches(Chem.MolFromSmarts('[C;R]=[C;R]'))
-                bs = [m.GetBondBetweenAtoms(x, y).GetIdx() for x, y in bis]
-                bs = []
-                labels = []
-                for bi in bis:
-                    b = m.GetBondBetweenAtoms(bi[0], bi[1])
-                    if b.GetBeginAtomIdx() == bi[0]:
-                        labels.append((100, 100))
-                    else:
-                        labels.append((100, 100))
-                    bs.append(b.GetIdx())
-
-                nm = Chem.FragmentOnBonds(m, bs, dummyLabels=labels)
-                smile_products.append(Chem.MolToSmiles(nm, True))
-                print(Chem.MolToSmiles(nm, True))
-                del (smile_products[i])
-
-                while FunctionalGroups.cleaved_alkene(smile_products[i]) == True:
-                    # One hydrogen bonded to the carbon
-                    rxn1 = AllChem.ReactionFromSmarts(
-                        '[C:0][CH:1]=[100*:2].[O:3]=[O:4]>>[C:0][C:1](=[O:3])-[O:4].[100*:2]',
-                        useSmiles=True)
-                    ps1 = rxn1.RunReactants(
-                        (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O")))
-
-                    # No hydrogens bonded to the carbon
-                    rxn2 = AllChem.ReactionFromSmarts('[C:1]=[100*:2].[O:3]>>[C:1]=[O:3].[100*:2]',
-                                                      useSmiles=True)
-                    ps2 = rxn2.RunReactants(
-                        (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O")))
-
-                    m1 = Chem.MolFromSmiles(smile_products[i])
-                    patt1 = Chem.MolFromSmarts("[CH]=[100*]")
-                    r1 = m1.HasSubstructMatch(patt1)
-
-                    m2 = Chem.MolFromSmiles(smile_products[i])
-                    patt2 = Chem.MolFromSmarts("[CH0](=[100*])")
-                    r2 = m2.HasSubstructMatch(patt2)
-
-                    if r1 == True:
-                        smile_products.append(Chem.MolToSmiles(ps1[0][0]))
-                        del (smile_products[i])
-                        i = 0
-                    elif r2 == True:
-                        smile_products.append(Chem.MolToSmiles(ps2[0][0]))
-                        del (smile_products[i])
-                        i = 0
-
-            elif FunctionalGroups.nonring_alkene(smile_products[i]) == True:
-
-                # Two hydrogens bonded to the carbon
-                rxn1 = AllChem.ReactionFromSmarts(
-                    '[CH2:1]=[CH2:2].([O:3]=[O:4].[O:5]=[O:6])>>[O:3]=[C:1]=[O:4].[O:5]=[C:2]=[O:6]',
-                    useSmiles=True)
-                ps1 = rxn1.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
-
-                # One hydrogen bonded to the carbon
-                rxn2 = AllChem.ReactionFromSmarts(
-                    '[CH2:1]=[CH:2].([O:3]=[O:4].[O:5]=[O:6])>>[O:3]=[C:1]=[O:4].[C:2]([O:5])=[O:6]',
-                    useSmiles=True)
-                ps2 = rxn2.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
-
-                # No hydrogens bonded to the carbon
-                rxn3 = AllChem.ReactionFromSmarts(
-                    '[CH2:1]=[CH0:2].([O:3]=[O:4].[O:5])>>[O:3]=[C:1]=[O:4].[CH0:2]=[O:5]',
-                    useSmiles=True)
-                ps3 = rxn3.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O")))
-
-                rxn4 = AllChem.ReactionFromSmarts(
-                    '[CH:1]=[CH:2].([O:3]=[O:4].[O:5]=[O:6])>>[C:1]([O:3])=[O:4].[C:2]([O:5])=[O:6]',
-                    useSmiles=True)
-                ps4 = rxn4.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
-
-                rxn5 = AllChem.ReactionFromSmarts(
-                    '[CH:1]=[CH0:2].([O:3]=[O:4].[O:5])>>[C:1]([O:3])=[O:4].[CH0:2]=[O:5]',
-                    useSmiles=True)
-                ps5 = rxn5.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O")))
-
-                rxn6 = AllChem.ReactionFromSmarts(
-                    '[CH0:1]=[CH0:2].[O:3]=[O:4]>>[CH0:1]=[O:3].[CH0:2]=[O:4]', useSmiles=True)
-                ps6 = rxn6.RunReactants(
-                    (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O")))
-
-                m1 = Chem.MolFromSmiles(smile_products[i])
-                patt1 = Chem.MolFromSmarts("[CH2]=[CH2]")
-                r1 = m1.HasSubstructMatch(patt1)
-
-                m2 = Chem.MolFromSmiles(smile_products[i])
-                patt2 = Chem.MolFromSmarts("[CH2]=[CH]")
-                r2 = m2.HasSubstructMatch(patt2)
-
-                m3 = Chem.MolFromSmiles(smile_products[i])
-                patt3 = Chem.MolFromSmarts("[CH2]=[CH0]")
-                r3 = m3.HasSubstructMatch(patt3)
-
-                m4 = Chem.MolFromSmiles(smile_products[i])
-                patt4 = Chem.MolFromSmarts("[CH]=[CH]")
-                r4 = m4.HasSubstructMatch(patt4)
-
-                m5 = Chem.MolFromSmiles(smile_products[i])
-                patt5 = Chem.MolFromSmarts("[CH]=[CH0]")
-                r5 = m5.HasSubstructMatch(patt5)
-
-                m6 = Chem.MolFromSmiles(smile_products[i])
-                patt6 = Chem.MolFromSmarts("[CH0]=[CH0]")
-                r6 = m6.HasSubstructMatch(patt6)
-
-                list_of_possible_configurations = [r1, r2, r3, r4, r5, r6]
-                list_of_possible_reactions = [ps1, ps2, ps3, ps4, ps5, ps6]
-
-                j = 0
-                for j in range(6):
-                    if list_of_possible_configurations[j] == True:
-                        smile_products.append(Chem.MolToSmiles(list_of_possible_reactions[j][0][0]))
-                        smile_products.append(Chem.MolToSmiles(list_of_possible_reactions[j][0][1]))
-
-                        del (smile_products[i])
-                        i = i
-
-                    else:
-                        j += 1
-
-            else:
-                i += 1
-
-        k = 0
-        # for k in range(len(smile_products)):
-        #     draw(smile_products[k])
-        #     k += 1
-
-        return smile_products
+    # @staticmethod
+    # def KMnO4_alkene_cleavage(smile):
+    #     # draw(smile)
+    #     smile_products = [smile]
+    #
+    #     i = 0
+    #     while i in range(len(smile_products)):
+    #         if FunctionalGroups.ring_alkene(smile_products[i]) == True:
+    #             m = Chem.MolFromSmiles(smile_products[i])
+    #
+    #             bis = m.GetSubstructMatches(Chem.MolFromSmarts('[C;R]=[C;R]'))
+    #             bs = [m.GetBondBetweenAtoms(x, y).GetIdx() for x, y in bis]
+    #             bs = []
+    #             labels = []
+    #             for bi in bis:
+    #                 b = m.GetBondBetweenAtoms(bi[0], bi[1])
+    #                 if b.GetBeginAtomIdx() == bi[0]:
+    #                     labels.append((100, 100))
+    #                 else:
+    #                     labels.append((100, 100))
+    #                 bs.append(b.GetIdx())
+    #
+    #             nm = Chem.FragmentOnBonds(m, bs, dummyLabels=labels)
+    #             smile_products.append(Chem.MolToSmiles(nm, True))
+    #             print(Chem.MolToSmiles(nm, True))
+    #             del (smile_products[i])
+    #
+    #             while FunctionalGroups.cleaved_alkene(smile_products[i]) == True:
+    #                 # One hydrogen bonded to the carbon
+    #                 rxn1 = AllChem.ReactionFromSmarts(
+    #                     '[C:0][CH:1]=[100*:2].[O:3]=[O:4]>>[C:0][C:1](=[O:3])-[O:4].[100*:2]',
+    #                     useSmiles=True)
+    #                 ps1 = rxn1.RunReactants(
+    #                     (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O")))
+    #
+    #                 # No hydrogens bonded to the carbon
+    #                 rxn2 = AllChem.ReactionFromSmarts('[C:1]=[100*:2].[O:3]>>[C:1]=[O:3].[100*:2]',
+    #                                                   useSmiles=True)
+    #                 ps2 = rxn2.RunReactants(
+    #                     (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O")))
+    #
+    #                 m1 = Chem.MolFromSmiles(smile_products[i])
+    #                 patt1 = Chem.MolFromSmarts("[CH]=[100*]")
+    #                 r1 = m1.HasSubstructMatch(patt1)
+    #
+    #                 m2 = Chem.MolFromSmiles(smile_products[i])
+    #                 patt2 = Chem.MolFromSmarts("[CH0](=[100*])")
+    #                 r2 = m2.HasSubstructMatch(patt2)
+    #
+    #                 if r1 == True:
+    #                     smile_products.append(Chem.MolToSmiles(ps1[0][0]))
+    #                     del (smile_products[i])
+    #                     i = 0
+    #                 elif r2 == True:
+    #                     smile_products.append(Chem.MolToSmiles(ps2[0][0]))
+    #                     del (smile_products[i])
+    #                     i = 0
+    #
+    #         elif FunctionalGroups.nonring_alkene(smile_products[i]) == True:
+    #
+    #             # Two hydrogens bonded to the carbon
+    #             rxn1 = AllChem.ReactionFromSmarts(
+    #                 '[CH2:1]=[CH2:2].([O:3]=[O:4].[O:5]=[O:6])>>[O:3]=[C:1]=[O:4].[O:5]=[C:2]=[O:6]',
+    #                 useSmiles=True)
+    #             ps1 = rxn1.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
+    #
+    #             # One hydrogen bonded to the carbon
+    #             rxn2 = AllChem.ReactionFromSmarts(
+    #                 '[CH2:1]=[CH:2].([O:3]=[O:4].[O:5]=[O:6])>>[O:3]=[C:1]=[O:4].[C:2]([O:5])=[O:6]',
+    #                 useSmiles=True)
+    #             ps2 = rxn2.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
+    #
+    #             # No hydrogens bonded to the carbon
+    #             rxn3 = AllChem.ReactionFromSmarts(
+    #                 '[CH2:1]=[CH0:2].([O:3]=[O:4].[O:5])>>[O:3]=[C:1]=[O:4].[CH0:2]=[O:5]',
+    #                 useSmiles=True)
+    #             ps3 = rxn3.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O")))
+    #
+    #             rxn4 = AllChem.ReactionFromSmarts(
+    #                 '[CH:1]=[CH:2].([O:3]=[O:4].[O:5]=[O:6])>>[C:1]([O:3])=[O:4].[C:2]([O:5])=[O:6]',
+    #                 useSmiles=True)
+    #             ps4 = rxn4.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O=O")))
+    #
+    #             rxn5 = AllChem.ReactionFromSmarts(
+    #                 '[CH:1]=[CH0:2].([O:3]=[O:4].[O:5])>>[C:1]([O:3])=[O:4].[CH0:2]=[O:5]',
+    #                 useSmiles=True)
+    #             ps5 = rxn5.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O.O")))
+    #
+    #             rxn6 = AllChem.ReactionFromSmarts(
+    #                 '[CH0:1]=[CH0:2].[O:3]=[O:4]>>[CH0:1]=[O:3].[CH0:2]=[O:4]', useSmiles=True)
+    #             ps6 = rxn6.RunReactants(
+    #                 (Chem.MolFromSmiles(smile_products[i]), Chem.MolFromSmiles("O=O")))
+    #
+    #             m1 = Chem.MolFromSmiles(smile_products[i])
+    #             patt1 = Chem.MolFromSmarts("[CH2]=[CH2]")
+    #             r1 = m1.HasSubstructMatch(patt1)
+    #
+    #             m2 = Chem.MolFromSmiles(smile_products[i])
+    #             patt2 = Chem.MolFromSmarts("[CH2]=[CH]")
+    #             r2 = m2.HasSubstructMatch(patt2)
+    #
+    #             m3 = Chem.MolFromSmiles(smile_products[i])
+    #             patt3 = Chem.MolFromSmarts("[CH2]=[CH0]")
+    #             r3 = m3.HasSubstructMatch(patt3)
+    #
+    #             m4 = Chem.MolFromSmiles(smile_products[i])
+    #             patt4 = Chem.MolFromSmarts("[CH]=[CH]")
+    #             r4 = m4.HasSubstructMatch(patt4)
+    #
+    #             m5 = Chem.MolFromSmiles(smile_products[i])
+    #             patt5 = Chem.MolFromSmarts("[CH]=[CH0]")
+    #             r5 = m5.HasSubstructMatch(patt5)
+    #
+    #             m6 = Chem.MolFromSmiles(smile_products[i])
+    #             patt6 = Chem.MolFromSmarts("[CH0]=[CH0]")
+    #             r6 = m6.HasSubstructMatch(patt6)
+    #
+    #             list_of_possible_configurations = [r1, r2, r3, r4, r5, r6]
+    #             list_of_possible_reactions = [ps1, ps2, ps3, ps4, ps5, ps6]
+    #
+    #             j = 0
+    #             for j in range(6):
+    #                 if list_of_possible_configurations[j] == True:
+    #                     smile_products.append(Chem.MolToSmiles(list_of_possible_reactions[j][0][0]))
+    #                     smile_products.append(Chem.MolToSmiles(list_of_possible_reactions[j][0][1]))
+    #
+    #                     del (smile_products[i])
+    #                     i = i
+    #
+    #                 else:
+    #                     j += 1
+    #
+    #         else:
+    #             i += 1
+    #
+    #     k = 0
+    #     # for k in range(len(smile_products)):
+    #     #     draw(smile_products[k])
+    #     #     k += 1
+    #
+    #     return smile_products
 
     @staticmethod
     def oxidative_cleavage_of_1_2_diols(smile):
@@ -1469,6 +1469,30 @@ class AlkeneReactions:
         #     draw(smile_products[k])
         #     k += 1
         return smile_products
+
+    @staticmethod
+    def partial_alkyne_hydrogenation(smile):
+        smile_products = [smile]
+        # draw(smile)
+
+        smile1 = smile_products[0]
+
+        while FunctionalGroups.alkyne(smile1) == True:
+            rxn1 = AllChem.ReactionFromSmarts('[C:1]#[C:2].[H:3][H:4]>>[C:1](-[H:3])=[C:2](-[H:4])',
+                                              useSmiles=True)
+            ps1 = rxn1.RunReactants((Chem.MolFromSmiles(smile1), Chem.MolFromSmiles("[H][H]")))
+            smile_products.append(Chem.MolToSmiles(ps1[0][0]))
+            del (smile_products[0])
+            smile1 = smile_products[0]
+
+        # k = 0
+        # for k in range(len(smile_products)):
+        #     draw(smile_products[k])
+        #     k += 1
+
+        return smile_products
+
+
 
     @staticmethod
     def getAllReactions():

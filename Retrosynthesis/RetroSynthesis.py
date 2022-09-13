@@ -371,7 +371,7 @@ class State:
 
 
 def main():
-    initial_state = State("c1ccccc1", "Clc1ccccc1")
+    initial_state = State("CC=C", "CCCC")
     finalprod = "Clc1ccccc1"
     root = MonteCarloTreeSearchNode(state=initial_state)
     selected_node = root.best_action()
